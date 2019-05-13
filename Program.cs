@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 
@@ -88,44 +89,36 @@ namespace MXSPyCOM
 						{
 							case "-f":
 
-								if (ext == ".py")
+							    if (File.Exists(logPath))
+							    {
+							        File.Delete(logPath);
+							    }
+
+                                if (ext == ".py")
 								{
 									filepath = make_python_wrapper(filepath);
 								}
+							    try
+							    {
+							        com_obj.execute("openLog \"" + logPath + "\"");
+							    }
+							    catch (System.Runtime.InteropServices.COMException) { }
 
-								try
+                                try
 								{
 									com_obj.filein(filepath);
 								}
 								catch (System.Runtime.InteropServices.COMException) { }
-								break;
+								
 
-							case "-ll":
-								try
-								{
-									com_obj.execute("openLog \"" + logPath + "\"");
-								}
-								catch (System.Runtime.InteropServices.COMException) { }
+							    try
+							    {
+							        com_obj.execute("closeLog()");
+							    }
+							    catch (System.Runtime.InteropServices.COMException) { }
 
-								try
-								{
-									if (ext == ".py")
-									{
-										filepath = make_python_wrapper(filepath);
-									}
-									com_obj.fileIn(filepath);
-								}
-								catch (System.Runtime.InteropServices.COMException) { }
-
-								try
-								{
-									com_obj.execute("closeLog()");
-								}
-								catch (System.Runtime.InteropServices.COMException) { }
-
-								log_listener_output(logPath);
-								break;
-
+							    log_listener_output(logPath);
+							    break;
 
 							case "-s":
 
